@@ -20,22 +20,22 @@ public class MyConfig extends WebSecurityConfigurerAdapter {
 	public UserDetailsService getUserDetailsService() {
 		return new UserDetailsServiceImpl();
 	}
-	
+
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
 	public DaoAuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-		
+
 		daoAuthenticationProvider.setUserDetailsService(this.getUserDetailsService());
-		
+
 		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-		
+
 		return daoAuthenticationProvider;
-		
+
 	}
 
 	@Override
@@ -45,17 +45,9 @@ public class MyConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
-		.antMatchers("/admin/**").hasRole("ADMIN")
-		.antMatchers("/user/**").hasRole("USER")
-		.antMatchers("/**").permitAll().and()
-		.formLogin().loginPage("/login")
-		.successHandler(new CustomAuthenticationSuccessHandler())
-		.and().csrf().disable();
+		http.authorizeRequests().antMatchers("/admin/**").hasRole("ADMIN").antMatchers("/user/**").hasRole("USER")
+				.antMatchers("/**").permitAll().and().formLogin().loginPage("/login")
+				.successHandler(new CustomAuthenticationSuccessHandler()).and().csrf().disable();
 	}
-
-	
-	
-	
 
 }

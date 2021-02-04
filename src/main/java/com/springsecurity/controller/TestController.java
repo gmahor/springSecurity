@@ -1,12 +1,16 @@
 package com.springsecurity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.springsecurity.dao.UserRepo;
 import com.springsecurity.entities.User;
@@ -55,7 +59,28 @@ public class TestController {
 
 	@GetMapping("/login")
 	public String login() {
+		try {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+			if (!(authentication instanceof AnonymousAuthenticationToken)) {
+				User user = userRepo.getUserByUserName(authentication.getName());
+
+				if (user.getRole().contains("USER")) {
+					return "redirect:/user/userdashboard";
+				} else if (user.getRole().contains("ADMIN")) {
+					return "redirect:/admin/admindashboard";
+				} else {
+					return "redirect:/";
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		}
+
 		return "login";
+
 	}
 
 	@GetMapping("/admin/admindashboard")
